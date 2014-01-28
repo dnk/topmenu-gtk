@@ -1,0 +1,10 @@
+[Applet Factory]
+Id=TopMenuMatePanelAppletFactory
+Location=@LIBEXECDIR@/topmenu-mate-panel-applet
+Name=TopMenu Mate Panel Applet Factory
+Description=Trash Applet Factory
+
+[TopMenuMatePanelApplet]
+Name=TopMenu Panel Applet
+Description=Shows the TopMenu menu bar
+Icon=user-trash-full
