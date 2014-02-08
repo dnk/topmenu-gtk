@@ -66,8 +66,8 @@ void topmenu_server_register_server_widget(GtkWidget *widget)
 	stub_attr.override_redirect = TRUE;
 	GdkWindow *stub = gdk_window_new(window, &stub_attr, GDK_WA_NOREDIR);
 
-	g_object_set_data_full(G_OBJECT(widget), OBJECT_DATA_KEY_SERVER_STUB,
-	                       stub, (GDestroyNotify)gdk_window_destroy);
+	g_object_set_data_full(G_OBJECT(widget), OBJECT_DATA_KEY_SERVER_STUB, stub,
+	                       (GDestroyNotify) &gdk_window_destroy);
 
 	server_widgets = g_list_prepend(server_widgets, widget);
 	update_selection_owner(GDK_CURRENT_TIME);

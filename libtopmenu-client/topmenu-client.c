@@ -82,6 +82,10 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 		                        G_CALLBACK(handle_widget_button_event), plug, 0);
 	gtk_widget_show(GTK_WIDGET(plug));
 
+	// Gtk+ should keep a reference to plug as it is a "top level" widget.
+	// Otherwise I failed to parse the documentation.
+	g_warn_if_fail(G_OBJECT(plug)->ref_count == 1);
+
 	Window plug_xwin = gtk_plug_get_id(plug);
 
 	Atom atom = XInternAtom(display, ATOM_TOPMENU_WINDOW, False);
@@ -90,7 +94,8 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 	                XA_WINDOW, 32, PropModeReplace,
 	                (unsigned char*)&plug_xwin, 1);
 
-	g_object_set_data_full(G_OBJECT(window), OBJECT_DATA_KEY_PLUG, plug, (GDestroyNotify)&gtk_widget_destroy);
+	g_object_set_data_full(G_OBJECT(window), OBJECT_DATA_KEY_PLUG, plug,
+	                       (GDestroyNotify) &gtk_widget_destroy);
 }
 
 void topmenu_client_disconnect_window(GdkWindow *window)
@@ -109,5 +114,6 @@ void topmenu_client_disconnect_window(GdkWindow *window)
 
 	XDeleteProperty(display, xwin, atom);
 
-	g_object_unref(plug);
+	g_warn_if_fail(G_OBJECT(plug)->ref_count == 1);
+	gtk_widget_destroy(plug);
 }
