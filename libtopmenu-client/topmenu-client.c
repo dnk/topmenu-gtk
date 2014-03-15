@@ -3,6 +3,10 @@
 
 #include "../global.h"
 
+#if GTK_VERSION == 3
+#include <gtk/gtkx.h>
+#endif
+
 #include "topmenu-client.h"
 
 #define OBJECT_DATA_KEY_PLUG "topmenu-plug"
@@ -23,10 +27,11 @@ static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, G
 
 	GdkWindow *socket = gtk_plug_get_socket_window(plug);
 	if (socket) {
+		GdkDisplay * display = gdk_window_get_display(socket);
 		GdkScreen *screen = gdk_window_get_screen(socket);
 		GdkWindow *root = gdk_screen_get_root_window(screen);
-		Display *dpy = GDK_WINDOW_XDISPLAY(socket);
-		Window xwin = GDK_WINDOW_XWINDOW(socket);
+		Display *dpy = gdk_x11_display_get_xdisplay(display);
+		Window xwin = gdk_x11_window_get_xid(socket);
 
 		if (event->type == GDK_BUTTON_PRESS) {
 			gdk_display_pointer_ungrab(gtk_widget_get_display(widget),
@@ -115,5 +120,5 @@ void topmenu_client_disconnect_window(GdkWindow *window)
 	XDeleteProperty(display, xwin, atom);
 
 	g_warn_if_fail(G_OBJECT(plug)->ref_count == 1);
-	gtk_widget_destroy(plug);
+	gtk_widget_destroy(GTK_WIDGET(plug));
 }

@@ -3,6 +3,10 @@
 
 #include <gtk/gtk.h>
 
+#if GTK_VERSION == 3
+#include <gtk/gtkx.h>
+#endif
+
 G_BEGIN_DECLS
 
 #define TOPMENU_TYPE_WIDGET           topmenu_widget_get_type()

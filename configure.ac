@@ -32,6 +32,7 @@ AC_ARG_ENABLE([mate-applet],
 			  [enable_mate_applet=check])
 
 AC_SUBST([GTK_VERSION], [$with_gtk])
+AC_DEFINE_UNQUOTED([GTK_VERSION], [$with_gtk], [Define to GTK major version used])
 AC_SUBST([GTK_MODULE_DIR], [$with_gtk_module_dir])
 
 # Checks for programs.

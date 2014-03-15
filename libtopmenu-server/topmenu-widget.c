@@ -123,7 +123,7 @@ static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window wind
 	GdkWindow *cur = gtk_socket_get_plug_window(self->socket);
 
 	if (cur) {
-		if (GDK_WINDOW_XWINDOW(cur) == window) {
+		if (gdk_x11_window_get_xid(cur) == window) {
 			// Trying to embed the same client again
 			return; // Nothing to do
 		}
@@ -315,23 +315,6 @@ static void topmenu_widget_unmap(GtkWidget *widget)
 	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->unmap(widget);
 }
 
-static void topmenu_widget_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
-{
-	TopMenuWidget *self = TOPMENU_WIDGET(widget);
-	if (self->socket) {
-		gtk_widget_size_allocate(GTK_WIDGET(self->socket), allocation);
-	}
-	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
-}
-
-static void topmenu_widget_size_request(GtkWidget *widget, GtkRequisition *requisition)
-{
-	TopMenuWidget *self = TOPMENU_WIDGET(widget);
-	if (self->socket) {
-		gtk_widget_size_request(GTK_WIDGET(self->socket), requisition);
-	}
-}
-
 static void topmenu_widget_dispose(GObject *obj)
 {
 	TopMenuWidget *self = TOPMENU_WIDGET(obj);
@@ -355,8 +338,6 @@ static void topmenu_widget_class_init(TopMenuWidgetClass *klass)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	widget_class->map = topmenu_widget_map;
 	widget_class->unmap = topmenu_widget_unmap;
-	widget_class->size_allocate = topmenu_widget_size_allocate;
-	widget_class->size_request = topmenu_widget_size_request;
 
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 	obj_class->dispose = topmenu_widget_dispose;
