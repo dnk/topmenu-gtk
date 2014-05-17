@@ -123,7 +123,7 @@ static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window wind
 	GdkWindow *cur = gtk_socket_get_plug_window(self->socket);
 
 	if (cur) {
-		if (gdk_x11_window_get_xid(cur) == window) {
+		if (GDK_WINDOW_XID(cur) == window) {
 			// Trying to embed the same client again
 			return; // Nothing to do
 		}

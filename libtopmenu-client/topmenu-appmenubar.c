@@ -48,6 +48,7 @@ static void topmenu_app_menu_bar_class_init(TopMenuAppMenuBarClass *klass)
 
 	g_object_class_install_properties(obj_class, N_PROPERTIES, properties);
 
+#if GTK_MAJOR_VERSION == 2
 	gtk_rc_parse_string (
 		"style \"app-menubar-style\"\n"
 		"{\n"
@@ -55,10 +56,41 @@ static void topmenu_app_menu_bar_class_init(TopMenuAppMenuBarClass *klass)
 		"  GtkMenuBar::internal-padding = 0\n"
 		"}\n"
 		"class \"TopMenuAppMenuBar\" style \"app-menubar-style\"");
+#endif
 }
 
 static void topmenu_app_menu_bar_init(TopMenuAppMenuBar *self)
 {
+#if GTK_MAJOR_VERSION == 3
+	GError *error = NULL;
+	GtkCssProvider *provider = gtk_css_provider_new();
+	GtkStyleContext *style_context = gtk_widget_get_style_context(GTK_WIDGET(self));
+	static const char *css =
+	        "TopMenuAppMenuBar {\n"
+	        "   box-shadow: none;\n"
+	        "	padding: 0;\n"
+	        "	background-color: @os_chrome_bg_color;\n"
+			"	background-image: none;\n"
+			"	color: @os_chrome_fg_color;\n"
+	        "}\n"
+	        "\n"
+			"TopMenuAppMenuBar .menu .menuitem *:active {\n"
+	        "	color: @theme_text_color;\n"
+			"}\n"
+			"\n"
+			"TopMenuAppMenuBar .menu .menuitem *:selected {\n"
+	        "	color: @theme_selected_fg_color;\n"
+			"}\n";
+	if (gtk_css_provider_load_from_data(provider, css, -1, &error)) {
+		gtk_style_context_add_provider(style_context,
+		                               GTK_STYLE_PROVIDER(provider),
+		                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	} else {
+		g_warning("Error while loading CSS: %s", error->message);
+		g_error_free(error);
+	}
+#endif
+
 	self->app_menu_item = GTK_MENU_ITEM(gtk_menu_item_new_with_label(g_get_application_name()));
 	GtkLabel *app_label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(self->app_menu_item)));
 	PangoAttrList *app_label_attr = pango_attr_list_new();

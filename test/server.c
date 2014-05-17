@@ -22,7 +22,6 @@ static void construct_main_window()
 
 int main(int argc, char **argv)
 {
-	gtk_set_locale();
 	gtk_init(&argc, &argv);
 
 	construct_main_window();

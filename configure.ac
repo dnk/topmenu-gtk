@@ -31,6 +31,7 @@ AC_ARG_ENABLE([mate-applet],
 			  [],
 			  [enable_mate_applet=check])
 
+AM_CONDITIONAL([GTK3], [test GTK$with_gtk = GTK3])
 AC_SUBST([GTK_VERSION], [$with_gtk])
 AC_DEFINE_UNQUOTED([GTK_VERSION], [$with_gtk], [Define to GTK major version used])
 AC_SUBST([GTK_MODULE_DIR], [$with_gtk_module_dir])
@@ -43,37 +44,39 @@ AC_PROG_LIBTOOL
 # Checks for libraries.
 PKG_CHECK_MODULES([GTK], [gtk+-x11-$with_gtk.0])
 
-AS_IF([test "x$with_wnck" = xwnck1 -o "x$with_wnck" = xcheck],
-	[PKG_CHECK_MODULES([WNCK], [libwnck-1.0],
-		[
-			AC_DEFINE([HAVE_WNCK1], [1], [Define if you have libwnck-1.0])
-			with_wnck=libwnck1
-		],
-		[if test "x$with_wnck" = xwnck1; then
-			AC_MSG_FAILURE([--with-wnck=wnck1 was given, but test for libwnck-1.0 failed])
-		fi]
-	)])
-AS_IF([test "x$with_wnck" = xmatewnck -o "x$with_wnck" = xcheck],
-	[PKG_CHECK_MODULES([MATEWNCK], [libmatewnck],
-		[
-			AC_DEFINE([HAVE_MATEWNCK], [1], [Define if you have libmatewnck])
-			with_wnck=libmatewnck
-		],
-		[if test "x$with_wnck" = xmatewnck; then
-			AC_MSG_FAILURE([--with-wnck=matewnck was given, but test for libmatewnck failed])
-		fi]
-	)])
+AS_IF([test "x$with_gtk" = x3],
+	[],
+	[AS_IF([test "x$with_wnck" = xwnck1 -o "x$with_wnck" = xcheck],
+		[PKG_CHECK_MODULES([WNCK], [libwnck-1.0],
+			[
+				AC_DEFINE([HAVE_WNCK1], [1], [Define if you have libwnck-1.0])
+				with_wnck=libwnck1
+			],
+			[if test "x$with_wnck" = xwnck1; then
+				AC_MSG_FAILURE([--with-wnck=wnck1 was given, but test for libwnck-1.0 failed])
+			fi]
+		)])
+	AS_IF([test "x$with_wnck" = xmatewnck -o "x$with_wnck" = xcheck],
+		[PKG_CHECK_MODULES([MATEWNCK], [libmatewnck],
+			[
+				AC_DEFINE([HAVE_MATEWNCK], [1], [Define if you have libmatewnck])
+				with_wnck=libmatewnck
+			],
+			[if test "x$with_wnck" = xmatewnck; then
+				AC_MSG_FAILURE([--with-wnck=matewnck was given, but test for libmatewnck failed])
+			fi]
+		)])
 
-AS_IF([test "x$enable_mate_applet" != xno],
-	[PKG_CHECK_MODULES([MATEPANELAPPLET], [libmatepanelapplet-4.0],
-		[
-			AC_DEFINE([HAVE_MATEPANELAPPLET], [1], [Define if you have libmatepanelapplet])
-			enable_mate_applet=yes
-		],
-		[if test "x$enable_mate_applet" = xyes; then
-			AC_MSG_FAILURE([--enable-mate-applet was given, but test for libmatepanelapplet failed])
-		fi]
-	)])
+	AS_IF([test "x$enable_mate_applet" != xno],
+		[PKG_CHECK_MODULES([MATEPANELAPPLET], [libmatepanelapplet-4.0],
+			[
+				AC_DEFINE([HAVE_MATEPANELAPPLET], [1], [Define if you have libmatepanelapplet])
+				enable_mate_applet=yes
+			],
+			[if test "x$enable_mate_applet" = xyes; then
+				AC_MSG_FAILURE([--enable-mate-applet was given, but test for libmatepanelapplet failed])
+			fi]
+		)])])
 
 AM_CONDITIONAL([WANT_MATE_APPLET], [test x$enable_mate_applet = xyes])
 

@@ -1,3 +1,11 @@
+#include <gtk/gtk.h>
+
+#include "../global.h"
+
+#if GTK_MAJOR_VERSION == 3
+#include <gtk/gtkx.h>
+#endif
+
 #include "../libtopmenu-client/topmenu-monitor.h"
 
 #include "data.h"

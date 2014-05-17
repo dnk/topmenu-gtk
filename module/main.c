@@ -441,7 +441,7 @@ hijacked_application_window_realize (GtkWidget *widget)
 	if (pre_hijacked_application_window_realize != NULL)
 		(* pre_hijacked_application_window_realize) (widget);
 
-	gtk_window_get_window_data (GTK_WINDOW (widget));
+	topmenu_get_window_data (GTK_WINDOW (widget));
 }
 #endif
 
@@ -536,7 +536,7 @@ hijacked_menu_bar_get_preferred_width (GtkWidget *widget,
 	if (pre_hijacked_menu_bar_get_preferred_width != NULL)
 		(* pre_hijacked_menu_bar_get_preferred_width) (widget, minimum_width, natural_width);
 
-	if (gtk_widget_shell_shows_menubar (widget))
+	if (topmenu_should_hide_menubar(widget))
 	{
 		*minimum_width = 0;
 		*natural_width = 0;
@@ -553,7 +553,7 @@ hijacked_menu_bar_get_preferred_height (GtkWidget *widget,
 	if (pre_hijacked_menu_bar_get_preferred_height != NULL)
 		(* pre_hijacked_menu_bar_get_preferred_height) (widget, minimum_height, natural_height);
 
-	if (gtk_widget_shell_shows_menubar (widget))
+	if (topmenu_should_hide_menubar(widget))
 	{
 		*minimum_height = 0;
 		*natural_height = 0;
@@ -571,7 +571,7 @@ hijacked_menu_bar_get_preferred_width_for_height (GtkWidget *widget,
 	if (pre_hijacked_menu_bar_get_preferred_width_for_height != NULL)
 		(* pre_hijacked_menu_bar_get_preferred_width_for_height) (widget, height, minimum_width, natural_width);
 
-	if (gtk_widget_shell_shows_menubar (widget))
+	if (topmenu_should_hide_menubar(widget))
 	{
 		*minimum_width = 0;
 		*natural_width = 0;
@@ -589,7 +589,7 @@ hijacked_menu_bar_get_preferred_height_for_width (GtkWidget *widget,
 	if (pre_hijacked_menu_bar_get_preferred_height_for_width != NULL)
 		(* pre_hijacked_menu_bar_get_preferred_height_for_width) (widget, width, minimum_height, natural_height);
 
-	if (gtk_widget_shell_shows_menubar (widget))
+	if (topmenu_should_hide_menubar(widget))
 	{
 		*minimum_height = 0;
 		*natural_height = 0;

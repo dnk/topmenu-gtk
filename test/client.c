@@ -19,24 +19,26 @@ static GtkWidget * create_menu_bar(void)
 	GtkLabel *app_label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(app)));
 	gtk_label_set_markup(app_label, "<b>Client</b>");
 
-	gtk_menu_bar_append(bar, GTK_WIDGET(app));
-	gtk_menu_bar_append(bar, GTK_WIDGET(file));
-	gtk_menu_bar_append(bar, GTK_WIDGET(edit));
-	gtk_menu_bar_append(bar, GTK_WIDGET(help));
+	gtk_menu_shell_append(GTK_MENU_SHELL(bar), GTK_WIDGET(app));
+	gtk_menu_shell_append(GTK_MENU_SHELL(bar), GTK_WIDGET(file));
+	gtk_menu_shell_append(GTK_MENU_SHELL(bar), GTK_WIDGET(edit));
+	gtk_menu_shell_append(GTK_MENU_SHELL(bar), GTK_WIDGET(help));
 
 	GtkMenu *app_menu = GTK_MENU(gtk_menu_new());
 	GtkMenuItem *quit = GTK_MENU_ITEM(gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL));
-	gtk_menu_append(app_menu, GTK_WIDGET(quit));
+	gtk_menu_shell_append(GTK_MENU_SHELL(app_menu), GTK_WIDGET(quit));
 	gtk_menu_item_set_submenu(app, GTK_WIDGET(app_menu));
 
 	GtkMenu *file_menu = GTK_MENU(gtk_menu_new());
 	GtkMenuItem *new = GTK_MENU_ITEM(gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL));
-	gtk_menu_append(file_menu, GTK_WIDGET(new));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), GTK_WIDGET(new));
 	GtkMenuItem *open = GTK_MENU_ITEM(gtk_image_menu_item_new_from_stock(GTK_STOCK_OPEN, NULL));
-	gtk_menu_append(file_menu, GTK_WIDGET(open));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), GTK_WIDGET(open));
 	GtkMenuItem *close = GTK_MENU_ITEM(gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, NULL));
-	gtk_menu_append(file_menu, GTK_WIDGET(close));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), GTK_WIDGET(close));
 	gtk_menu_item_set_submenu(file, GTK_WIDGET(file_menu));
+
+	gtk_widget_show_all(GTK_WIDGET(bar));
 
 	return GTK_WIDGET(bar);
 }
@@ -58,18 +60,18 @@ GtkWindow * create_main_window()
 
 int main(int argc, char **argv)
 {
-	gtk_set_locale();
 	gtk_init(&argc, &argv);
 
 	mainwin = create_main_window();
-	topmenu_monitor_get_instance();
 
 	g_signal_connect(mainwin, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
 	gtk_widget_realize(GTK_WIDGET(mainwin));
 
+#if 0
 	topmenu_client_connect_window_widget(gtk_widget_get_window(GTK_WIDGET(mainwin)),
 	                                     create_menu_bar());
+#endif
 
 	gtk_widget_show_all(GTK_WIDGET(mainwin));
 

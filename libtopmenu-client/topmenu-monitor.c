@@ -110,7 +110,7 @@ static void topmenu_monitor_dispose(GObject *obj)
 	if (self->priv->cur_server) {
 		gdk_window_remove_filter(self->priv->cur_server,
 		                         handle_cur_server_event, self);
-		gdk_window_unref(self->priv->cur_server);
+		g_object_unref(self->priv->cur_server);
 		self->priv->cur_server = 0;
 	}
 	self->priv->selection = NULL;

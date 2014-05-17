@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 
-#if GTK_VERSION == 3
+#if GTK_MAJOR_VERSION == 3
 #include <gtk/gtkx.h>
 #endif
 

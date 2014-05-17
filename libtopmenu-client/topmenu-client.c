@@ -43,7 +43,7 @@ static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, G
 		e.type = event->type == GDK_BUTTON_PRESS ? ButtonPress : ButtonRelease;
 		e.xbutton.window = xwin;
 		e.xbutton.display = dpy;
-		e.xbutton.root = GDK_WINDOW_XWINDOW(root);
+		e.xbutton.root = gdk_x11_window_get_xid(root);
 		e.xbutton.time = event->button.time;
 		e.xbutton.button = event->button.button;
 		e.xbutton.state = event->button.state;
@@ -76,7 +76,7 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 		topmenu_client_disconnect_window(window);
 	}
 
-	Window xwin = GDK_WINDOW_XID(window);
+	Window xwin = gdk_x11_window_get_xid(window);
 	GtkPlug *plug = GTK_PLUG(gtk_plug_new(0));
 	gtk_container_add(GTK_CONTAINER(plug), widget);
 	g_signal_connect_object(plug, "delete-event",
@@ -110,7 +110,7 @@ void topmenu_client_disconnect_window(GdkWindow *window)
 	gpointer window_data = g_object_steal_data(G_OBJECT(window), OBJECT_DATA_KEY_PLUG);
 	g_return_if_fail(window_data);
 
-	Window xwin = GDK_WINDOW_XID(window);
+	Window xwin = gdk_x11_window_get_xid(window);
 
 	GtkPlug *plug = GTK_PLUG(window_data);
 	g_return_if_fail(plug);
