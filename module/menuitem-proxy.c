@@ -185,6 +185,26 @@ struct _GtkMenuItemPrivate
 };
 #endif
 
+static gboolean
+menu_shell_is_active(GtkMenuShell *shell)
+{
+#if GTK_MAJOR_VERSION == 3
+	return shell->priv->active;
+#else
+	return shell->active;
+#endif
+}
+
+static void
+menu_shell_set_active(GtkMenuShell *shell, gboolean active)
+{
+#if GTK_MAJOR_VERSION == 3
+	shell->priv->active = active;
+#else
+	shell->active = active;
+#endif
+}
+
 static void
 free_timeval (GTimeVal *val)
 {
@@ -563,7 +583,8 @@ static gboolean handle_menuitem_mnemonic_activate(GtkMenuItem *item, gboolean cy
 
 	if (parent && monitor->available) {
 		GtkMenuShell *parent_shell = GTK_MENU_SHELL(parent);
-		if (GTK_IS_MENU_BAR(parent_shell) || parent_shell->priv->active) {
+
+		if (GTK_IS_MENU_BAR(parent_shell) || menu_shell_is_active(parent_shell)) {
 			gtk_widget_mnemonic_activate(GTK_WIDGET(proxy), cycling);
 			return TRUE;
 		}
@@ -599,7 +620,7 @@ static void handle_proxy_select(GtkMenuItem *proxy, GtkMenuItem *item)
 		GtkMenuShell *parent_shell = GTK_MENU_SHELL(parent);
 		GTimeVal *popup_time = g_slice_new0(GTimeVal);
 
-        g_get_current_time(popup_time);
+		g_get_current_time(popup_time);
 		g_object_set_data_full(G_OBJECT(submenu),
 		                                "gtk-menu-exact-popup-time", popup_time,
 		                                (GDestroyNotify) free_timeval);
@@ -615,7 +636,11 @@ static void handle_proxy_select(GtkMenuItem *proxy, GtkMenuItem *item)
 		               GTK_WIDGET(proxy),
 		               menu_item_position_menu,
 		               proxy,
+#if GTK_MAJOR_VERSION == 3
 		               parent_shell->priv->button,
+#else
+		               parent_shell->button,
+#endif
 		               0);
 	}
 }
@@ -650,7 +675,8 @@ static void handle_proxy_activate_item(GtkMenuItem *proxy, GtkMenuItem *item)
 	if (submenu) {
 		GtkMenuShell *parent = GTK_MENU_SHELL(gtk_widget_get_parent(GTK_WIDGET(proxy)));
 		if (parent) {
-			parent->priv->active = TRUE;
+			menu_shell_set_active(parent, TRUE);
+
 			// We do not add grabs here, like Gtk+ does, because they are already done.
 			gtk_menu_shell_select_item(parent, GTK_WIDGET(proxy));
 			gtk_menu_shell_select_first(GTK_MENU_SHELL(submenu), TRUE);

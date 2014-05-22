@@ -30,8 +30,8 @@ static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, G
 		GdkDisplay * display = gdk_window_get_display(socket);
 		GdkScreen *screen = gdk_window_get_screen(socket);
 		GdkWindow *root = gdk_screen_get_root_window(screen);
-		Display *dpy = gdk_x11_display_get_xdisplay(display);
-		Window xwin = gdk_x11_window_get_xid(socket);
+		Display *dpy = GDK_DISPLAY_XDISPLAY(display);
+		Window xwin = GDK_WINDOW_XID(socket);
 
 		if (event->type == GDK_BUTTON_PRESS) {
 			gdk_display_pointer_ungrab(gtk_widget_get_display(widget),
@@ -43,7 +43,7 @@ static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, G
 		e.type = event->type == GDK_BUTTON_PRESS ? ButtonPress : ButtonRelease;
 		e.xbutton.window = xwin;
 		e.xbutton.display = dpy;
-		e.xbutton.root = gdk_x11_window_get_xid(root);
+		e.xbutton.root = GDK_WINDOW_XID(root);
 		e.xbutton.time = event->button.time;
 		e.xbutton.button = event->button.button;
 		e.xbutton.state = event->button.state;
@@ -76,7 +76,7 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 		topmenu_client_disconnect_window(window);
 	}
 
-	Window xwin = gdk_x11_window_get_xid(window);
+	Window xwin = GDK_WINDOW_XID(window);
 	GtkPlug *plug = GTK_PLUG(gtk_plug_new(0));
 	gtk_container_add(GTK_CONTAINER(plug), widget);
 	g_signal_connect_object(plug, "delete-event",
@@ -110,7 +110,7 @@ void topmenu_client_disconnect_window(GdkWindow *window)
 	gpointer window_data = g_object_steal_data(G_OBJECT(window), OBJECT_DATA_KEY_PLUG);
 	g_return_if_fail(window_data);
 
-	Window xwin = gdk_x11_window_get_xid(window);
+	Window xwin = GDK_WINDOW_XID(window);
 
 	GtkPlug *plug = GTK_PLUG(window_data);
 	g_return_if_fail(plug);

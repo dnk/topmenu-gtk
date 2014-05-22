@@ -4,7 +4,7 @@ libexec_PROGRAMS = topmenu-mate-panel-applet
 
 topmenu_mate_panel_applet_SOURCES = main.c topmenu-mate-panel-applet.c topmenu-mate-panel-applet.h
 topmenu_mate_panel_applet_CPPFLAGS = $(GTK_CFLAGS) $(MATEPANELAPPLET_CFLAGS) -DG_LOG_DOMAIN=\"topmenu-mate-panel-applet\"
-topmenu_mate_panel_applet_LDADD = $(GTK_LIBS) $(MATEPANELAPPLET_LIBS) ../libtopmenu-server/libtopmenu-server.la
+topmenu_mate_panel_applet_LDADD = $(GTK_LIBS) $(MATEPANELAPPLET_LIBS) ../libtopmenu-server/libtopmenu-server-gtk$(GTK_VERSION).la
 
 appletdir = $(datadir)/mate-panel/applets
 applet_DATA = com.javispedro.topmenu.MatePanelApplet.mate-panel-applet
