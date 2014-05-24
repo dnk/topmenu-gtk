@@ -7,6 +7,17 @@
 #include "topmenu-widget.h"
 #include "topmenu-server.h"
 
+#ifdef HAVE_WNCK1
+#define WNCK_I_KNOW_THIS_IS_UNSTABLE 1
+#include <libwnck/libwnck.h>
+#define HAVE_WNCK 1
+#endif
+
+#ifdef HAVE_WNCK3
+#include <libwnck/libwnck.h>
+#define HAVE_WNCK 3
+#endif
+
 #ifdef HAVE_MATEWNCK
 #include <libmatewnck/libmatewnck.h>
 #endif
@@ -16,8 +27,11 @@ struct _TopMenuWidgetPrivate
 	Atom atom_window;
 	Atom atom_transient_for;
 	GQueue followed_windows;
+#ifdef HAVE_WNCK
+	WnckScreen *wnck_screen;
+#endif
 #ifdef HAVE_MATEWNCK
-	MatewnckScreen *screen;
+	MatewnckScreen *matewnck_screen;
 #endif
 };
 
@@ -66,34 +80,62 @@ static Window topmenu_widget_get_toplevel_xwindow(TopMenuWidget *self)
 
 static Window topmenu_widget_get_current_active_window(TopMenuWidget *self)
 {
+#ifdef HAVE_WNCK
+	WnckWindow *window = wnck_screen_get_active_window(self->priv->wnck_screen);
+	if (window) {
+		return wnck_window_get_xid(window);
+	}
+#endif
 #ifdef HAVE_MATEWNCK
-	MatewnckWindow *window = matewnck_screen_get_active_window(self->priv->screen);
+	MatewnckWindow *window = matewnck_screen_get_active_window(self->priv->matewnck_screen);
 	if (window) {
 		return matewnck_window_get_xid(window);
-	} else {
-		return None;
 	}
-#else
-	return None;
 #endif
+	return None;
 }
 
 static Window topmenu_widget_get_session_leader(TopMenuWidget *self, Window window)
 {
+#ifdef HAVE_WNCK
+	WnckWindow *w = wnck_window_get(window);
+	if (w) {
+		return wnck_window_get_group_leader(w);
+	}
+#endif
 #ifdef HAVE_MATEWNCK
 	MatewnckWindow *w = matewnck_window_get(window);
 	if (w) {
 		return matewnck_window_get_group_leader(w);
-	} else {
-		return None;
 	}
-#else
-	return None;
 #endif
+	return None;
 }
 
 static Window topmenu_widget_get_any_app_window_with_menu(TopMenuWidget *self, Window window)
 {
+#ifdef HAVE_WNCK
+	Display *dpy = topmenu_widget_get_display(self);
+
+	WnckWindow *w = wnck_window_get(window);
+	if (!w) return None;
+
+	WnckApplication *app = wnck_window_get_application(w);
+	if (!app) return None;
+
+	GList *i, *windows = wnck_screen_get_windows_stacked(self->priv->wnck_screen);
+	if (!windows) return None;
+
+	for (i = g_list_last(windows); i; i = g_list_previous(i)) {
+		if (i->data != w && wnck_window_get_application(i->data) == app) {
+			Window candidate = wnck_window_get_xid(i->data);
+			Window menu_window = read_window_property(dpy, candidate, self->priv->atom_window);
+			if (menu_window) {
+				return candidate;
+			}
+		}
+	}
+#endif
 #ifdef HAVE_MATEWNCK
 	Display *dpy = topmenu_widget_get_display(self);
 
@@ -103,7 +145,7 @@ static Window topmenu_widget_get_any_app_window_with_menu(TopMenuWidget *self, W
 	MatewnckApplication *app = matewnck_window_get_application(w);
 	if (!app) return None;
 
-	GList *i, *windows = matewnck_screen_get_windows_stacked(self->priv->screen);
+	GList *i, *windows = matewnck_screen_get_windows_stacked(self->priv->matewnck_screen);
 	if (!windows) return None;
 
 	for (i = g_list_last(windows); i; i = g_list_previous(i)) {
@@ -115,10 +157,8 @@ static Window topmenu_widget_get_any_app_window_with_menu(TopMenuWidget *self, W
 			}
 		}
 	}
-	return None;
-#else
-	return None;
 #endif
+	return None;
 }
 
 static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window window)
@@ -264,8 +304,23 @@ static gboolean handle_socket_plug_removed(GtkSocket *socket, TopMenuWidget *sel
 	return TRUE; // Do not destroy the socket
 }
 
+#ifdef HAVE_WNCK
+static void handle_active_wnck_window_changed(WnckScreen *screen, WnckWindow *prev_window, TopMenuWidget *self)
+{
+	if (!gtk_widget_get_visible(GTK_WIDGET(self))) {
+		return;
+	}
+	WnckWindow *window = wnck_screen_get_active_window(screen);
+	if (window) {
+		topmenu_widget_set_followed_window(self, wnck_window_get_xid(window));
+	} else {
+		// No active window?
+	}
+}
+#endif
+
 #ifdef HAVE_MATEWNCK
-static void handle_active_window_changed(MatewnckScreen *screen, MatewnckWindow *prev_window, TopMenuWidget *self)
+static void handle_active_matewnck_window_changed(MatewnckScreen *screen, MatewnckWindow *prev_window, TopMenuWidget *self)
 {
 	if (!gtk_widget_get_visible(GTK_WIDGET(self))) {
 		return;
@@ -363,10 +418,16 @@ static void topmenu_widget_dispose(GObject *obj)
 		self->socket = NULL;
 	}
 	g_queue_clear(&self->priv->followed_windows);
+#ifdef HAVE_WNCK
+	if (self->priv->wnck_screen) {
+		g_signal_handlers_disconnect_by_data(self->priv->wnck_screen, self);
+		self->priv->wnck_screen = NULL;
+	}
+#endif
 #ifdef HAVE_MATEWNCK
-	if (self->priv->screen) {
-		g_signal_handlers_disconnect_by_data(self->priv->screen, self);
-		self->priv->screen = NULL;
+	if (self->priv->matewnck_screen) {
+		g_signal_handlers_disconnect_by_data(self->priv->matewnck_screen, self);
+		self->priv->matewnck_screen = NULL;
 	}
 #endif
 	G_OBJECT_CLASS(topmenu_widget_parent_class)->dispose(obj);
@@ -402,10 +463,15 @@ static void topmenu_widget_init(TopMenuWidget *self)
 	self->priv->atom_window = None;
 	self->priv->atom_transient_for = None;
 	g_queue_init(&self->priv->followed_windows);
+#ifdef HAVE_WNCK
+	self->priv->wnck_screen = wnck_screen_get_default();
+	g_signal_connect(self->priv->wnck_screen, "active-window-changed",
+	                 G_CALLBACK(handle_active_wnck_window_changed), self);
+#endif
 #ifdef HAVE_MATEWNCK
-	self->priv->screen = matewnck_screen_get_default();
-	g_signal_connect(self->priv->screen, "active-window-changed",
-	                 G_CALLBACK(handle_active_window_changed), self);
+	self->priv->matewnck_screen = matewnck_screen_get_default();
+	g_signal_connect(self->priv->matewnck_screen, "active-window-changed",
+	                 G_CALLBACK(handle_active_matewnck_window_changed), self);
 #endif
 	gdk_window_add_filter(NULL, handle_gdk_event, self);
 	gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->socket));
