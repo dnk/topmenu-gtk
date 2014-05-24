@@ -14,6 +14,7 @@
 #endif
 
 #ifdef HAVE_WNCK3
+#define WNCK_I_KNOW_THIS_IS_UNSTABLE 1
 #include <libwnck/libwnck.h>
 #define HAVE_WNCK 3
 #endif
