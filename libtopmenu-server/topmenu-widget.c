@@ -319,6 +319,25 @@ static void topmenu_widget_unmap(GtkWidget *widget)
 	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->unmap(widget);
 }
 
+static void topmenu_widget_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+{
+	TopMenuWidget *self = TOPMENU_WIDGET(widget);
+	if (self->socket) {
+		gtk_widget_size_allocate(GTK_WIDGET(self->socket), allocation);
+	}
+	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
+}
+
+#if GTK_MAJOR_VERSION == 2
+static void topmenu_widget_size_request(GtkWidget *widget, GtkRequisition *requisition)
+{
+	TopMenuWidget *self = TOPMENU_WIDGET(widget);
+	if (self->socket) {
+		gtk_widget_size_request(GTK_WIDGET(self->socket), requisition);
+	}
+}
+#endif
+
 static void topmenu_widget_dispose(GObject *obj)
 {
 	TopMenuWidget *self = TOPMENU_WIDGET(obj);
@@ -342,6 +361,10 @@ static void topmenu_widget_class_init(TopMenuWidgetClass *klass)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	widget_class->map = topmenu_widget_map;
 	widget_class->unmap = topmenu_widget_unmap;
+	widget_class->size_allocate = topmenu_widget_size_allocate;
+#if GTK_MAJOR_VERSION == 2
+	widget_class->size_request = topmenu_widget_size_request;
+#endif
 
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 	obj_class->dispose = topmenu_widget_dispose;
