@@ -68,7 +68,11 @@ static Window topmenu_widget_get_current_active_window(TopMenuWidget *self)
 {
 #ifdef HAVE_MATEWNCK
 	MatewnckWindow *window = matewnck_screen_get_active_window(self->priv->screen);
-	return matewnck_window_get_xid(window);
+	if (window) {
+		return matewnck_window_get_xid(window);
+	} else {
+		return None;
+	}
 #else
 	return None;
 #endif
@@ -129,7 +133,7 @@ static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window wind
 		}
 
 		// Otherwise, disembed the current client
-		g_debug("Pulling the plug");
+		g_debug("Disembedding window 0x%lx", GDK_WINDOW_XID(cur));
 		gdk_window_hide(cur);
 
 		// Reparent back to root window to end embedding

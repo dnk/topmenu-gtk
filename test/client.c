@@ -49,9 +49,11 @@ GtkWindow * create_main_window()
 	GtkVBox *box = GTK_VBOX(gtk_vbox_new(FALSE, 0));
 	GtkLabel *label = GTK_LABEL(gtk_label_new("Hello World"));
 
+#if 0
 	GtkWidget *bar = create_menu_bar();
-
 	gtk_box_pack_start(GTK_BOX(box), GTK_WIDGET(bar), FALSE, FALSE, 0);
+#endif
+
 	gtk_box_pack_start(GTK_BOX(box), GTK_WIDGET(label), TRUE, TRUE, 0);
 	gtk_container_add(GTK_CONTAINER(win), GTK_WIDGET(box));
 
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
 
 	gtk_widget_realize(GTK_WIDGET(mainwin));
 
-#if 0
+#if 1
 	topmenu_client_connect_window_widget(gtk_widget_get_window(GTK_WIDGET(mainwin)),
 	                                     create_menu_bar());
 #endif
