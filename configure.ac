@@ -22,7 +22,7 @@ AC_ARG_WITH([gtk-module-dir],
 			[],
 			[with_gtk_module_dir=$with_gtk_libdir/gtk-$with_gtk.0/modules])
 AC_ARG_WITH([wnck],
-            [AS_HELP_STRING([--with-wnck], [support window management using [wnck1|matewnck] @<:@default=check@:>@])],
+            [AS_HELP_STRING([--with-wnck], [support window management using [wnck1|wnck3|matewnck] @<:@default=check@:>@])],
             [],
             [with_wnck=check])
 
@@ -45,9 +45,19 @@ AC_PROG_LIBTOOL
 PKG_CHECK_MODULES([GTK], [gtk+-x11-$with_gtk.0])
 
 AS_IF([test "x$with_gtk" = x3],
-	[],
+	[AS_IF([test "x$with_wnck" = xwnck3 -o "x$with_wnck" = xcheck],
+		[PKG_CHECK_MODULES([WNCK3], [libwnck-3.0],
+			[
+				AC_DEFINE([HAVE_WNCK3], [1], [Define if you have libwnck-3.0])
+				with_wnck=libwnck3
+			],
+			[if test "x$with_wnck" = xwnck3; then
+				AC_MSG_FAILURE([--with-wnck=wnck3 was given, but test for libwnck-3.0 failed])
+			fi]
+		)])],
+
 	[AS_IF([test "x$with_wnck" = xwnck1 -o "x$with_wnck" = xcheck],
-		[PKG_CHECK_MODULES([WNCK], [libwnck-1.0],
+		[PKG_CHECK_MODULES([WNCK1], [libwnck-1.0],
 			[
 				AC_DEFINE([HAVE_WNCK1], [1], [Define if you have libwnck-1.0])
 				with_wnck=libwnck1

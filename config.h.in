@@ -42,6 +42,9 @@
 /* Define if you have libwnck-1.0 */
 #undef HAVE_WNCK1
 
+/* Define if you have libwnck-3.0 */
+#undef HAVE_WNCK3
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
