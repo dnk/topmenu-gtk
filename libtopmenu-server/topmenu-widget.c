@@ -328,7 +328,23 @@ static void topmenu_widget_size_allocate(GtkWidget *widget, GtkAllocation *alloc
 	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
 }
 
-#if GTK_MAJOR_VERSION == 2
+#if GTK_MAJOR_VERSION == 3
+static void topmenu_widget_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width)
+{
+	TopMenuWidget *self = TOPMENU_WIDGET(widget);
+	if (self->socket) {
+		gtk_widget_get_preferred_width(GTK_WIDGET(self->socket), minimal_width, natural_width);
+	}
+}
+
+static void topmenu_widget_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height)
+{
+	TopMenuWidget *self = TOPMENU_WIDGET(widget);
+	if (self->socket) {
+		gtk_widget_get_preferred_height(GTK_WIDGET(self->socket), minimal_height, natural_height);
+	}
+}
+#elif GTK_MAJOR_VERSION == 2
 static void topmenu_widget_size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
 	TopMenuWidget *self = TOPMENU_WIDGET(widget);
@@ -362,7 +378,10 @@ static void topmenu_widget_class_init(TopMenuWidgetClass *klass)
 	widget_class->map = topmenu_widget_map;
 	widget_class->unmap = topmenu_widget_unmap;
 	widget_class->size_allocate = topmenu_widget_size_allocate;
-#if GTK_MAJOR_VERSION == 2
+#if GTK_MAJOR_VERSION == 3
+	widget_class->get_preferred_width = topmenu_widget_get_preferred_width;
+	widget_class->get_preferred_height = topmenu_widget_get_preferred_height;
+#elif GTK_MAJOR_VERSION == 2
 	widget_class->size_request = topmenu_widget_size_request;
 #endif
 
