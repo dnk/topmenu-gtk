@@ -1,5 +1,6 @@
 /*
  * Copyright 2012 Canonical Ltd.
+ * Copyright 2014 Javier S. Pedro <maemo@javispedro.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +16,7 @@
  *
  * Authors: Ryan Lortie <desrt@desrt.ca>
  *          William Hua <william.hua@canonical.com>
+ *          Javier S. Pedro <maemo@javispedro.com>
  */
 
 #include <gtk/gtk.h>
