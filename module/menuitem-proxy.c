@@ -575,6 +575,15 @@ menu_item_position_menu (GtkMenu  *menu,
 #endif
 }
 
+static void handle_menuitem_child_notify(GtkLabel *item, GParamSpec *pspec, GtkMenuItem *proxy)
+{
+	// Note that it is OK to compare strings by pointer as they are all interned
+	if (pspec->name == pname_label) {
+		const gchar *label = gtk_label_get_label(item);
+		gtk_menu_item_set_label(proxy, label);
+	}
+}
+
 static void handle_menuitem_notify(GtkMenuItem *item, GParamSpec *pspec, GtkMenuItem *proxy)
 {
 	// Note that it is OK to compare strings by pointer as they are all interned
@@ -732,8 +741,10 @@ GtkMenuItem *topmenu_create_proxy_menu_item(GtkMenuItem *item)
 		if (gtk_image_menu_item_get_use_stock(iitem)) {
 			proxy = GTK_MENU_ITEM(gtk_image_menu_item_new_from_stock(label, NULL));
 		} else {
-			GtkWidget *iwidget = gtk_image_menu_item_get_image(iitem);
 			proxy = GTK_MENU_ITEM(gtk_image_menu_item_new_with_mnemonic(label));
+
+			// Try to get the image widget type.
+			GtkWidget *iwidget = gtk_image_menu_item_get_image(iitem);
 			if (iwidget) {
 				// Let's suppport some common widget types
 				if (GTK_IS_IMAGE(iwidget)) {
@@ -756,6 +767,12 @@ GtkMenuItem *topmenu_create_proxy_menu_item(GtkMenuItem *item)
 
 	if (gtk_widget_get_visible(GTK_WIDGET(item))) {
 		gtk_widget_show(GTK_WIDGET(proxy));
+	}
+
+	GtkWidget *child = gtk_bin_get_child(GTK_BIN(item));
+	if (child && GTK_IS_LABEL(child)) {
+		g_signal_connect_object(child, "notify",
+		                        G_CALLBACK(handle_menuitem_child_notify), proxy, 0);
 	}
 
 	g_signal_connect_object(item, "notify",
