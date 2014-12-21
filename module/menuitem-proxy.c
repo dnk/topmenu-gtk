@@ -575,7 +575,7 @@ menu_item_position_menu (GtkMenu  *menu,
 #endif
 }
 
-static void handle_menuitem_child_notify(GtkLabel *item, GParamSpec *pspec, GtkMenuItem *proxy)
+static void handle_menuitem_child_label_notify(GtkLabel *item, GParamSpec *pspec, GtkMenuItem *proxy)
 {
 	// Note that it is OK to compare strings by pointer as they are all interned
 	if (pspec->name == pname_label) {
@@ -769,17 +769,44 @@ GtkMenuItem *topmenu_create_proxy_menu_item(GtkMenuItem *item)
 		gtk_widget_show(GTK_WIDGET(proxy));
 	}
 
+	GtkLabel *child_label = NULL;
 	GtkWidget *child = gtk_bin_get_child(GTK_BIN(item));
-	if (child && GTK_IS_LABEL(child)) {
-		g_signal_connect_object(child, "notify",
-		                        G_CALLBACK(handle_menuitem_child_notify), proxy, 0);
+	if (child) {
+		if (GTK_IS_LABEL(child)) {
+			child_label = GTK_LABEL(child);
+		} else if (GTK_IS_BOX(child)) {
+			// Try to get the first label from a any child GtkBox
+			// Some programs (e.g. gvim) do this.
+			GList *children = gtk_container_get_children(GTK_CONTAINER(child));
+			if (children) {
+				if (GTK_IS_LABEL(children->data)) {
+					child_label = GTK_LABEL(children->data);
+				}
+			}
+		}
 	}
 
+	if (child_label && (!label || label[0] == '\0')) {
+		// If we didn't find an initial label in the logic above, but there's
+		// an existing child GtkLabel with some text, use it.
+		// We might lose accelerators, mnemonics so this is a last resort.
+		label = gtk_label_get_label(child_label);
+		gtk_menu_item_set_label(proxy, label);
+	}
+
+	// Connect to property notify signals in order to catch menuitem label changes.
 	g_signal_connect_object(item, "notify",
 	                        G_CALLBACK(handle_menuitem_notify), proxy, 0);
 	g_signal_connect_object(item, "mnemonic-activate",
 	                        G_CALLBACK(handle_menuitem_mnemonic_activate), proxy, 0);
 
+	// Some programs (e.g. SWT) directly change the properties on the child label
+	if (child_label) {
+		g_signal_connect_object(child_label, "notify",
+			                    G_CALLBACK(handle_menuitem_child_label_notify), proxy, 0);
+	}
+
+	// Catch activation events on the proxy and forward them
 	g_signal_connect_object(proxy, "select",
 	                        G_CALLBACK(handle_proxy_select), item, 0);
 	g_signal_connect_object(proxy, "deselect",
