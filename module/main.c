@@ -93,9 +93,6 @@ count_container_items (GtkContainer *container)
 	return count;
 }
 
-
-
-
 static gboolean
 topmenu_should_hide_menubar_on_window (GtkWindow *window)
 {

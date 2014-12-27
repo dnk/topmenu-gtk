@@ -37,7 +37,7 @@
  */
 
 #include "../libtopmenu-client/topmenu-monitor.h"
-
+#include "../global.h"
 #include "menuitem-proxy.h"
 
 static gboolean static_data_ok = FALSE;
@@ -59,149 +59,7 @@ static void init_static_data()
 }
 
 #if GTK_MAJOR_VERSION == 3
-/* What could possibly go wrong? */
-typedef enum
-{
-  GTK_DIRECTION_LEFT,
-  GTK_DIRECTION_RIGHT
-} GtkSubmenuDirection;
-
-typedef enum
-{
-  GTK_TOP_BOTTOM,
-  GTK_LEFT_RIGHT
-} GtkSubmenuPlacement;
-
-struct _GtkMenuPrivate
-{
-	GtkWidget *parent_menu_item;
-	GtkWidget *old_active_menu_item;
-
-	GtkAccelGroup *accel_group;
-	gchar         *accel_path;
-
-	GtkMenuPositionFunc position_func;
-	gpointer            position_func_data;
-	GDestroyNotify      position_func_data_destroy;
-	gint                position_x;
-	gint                position_y;
-
-	guint toggle_size;
-	guint accel_size;
-
-	GtkWidget *toplevel;
-
-	GtkWidget     *tearoff_window;
-	GtkWidget     *tearoff_hbox;
-	GtkWidget     *tearoff_scrollbar;
-	GtkAdjustment *tearoff_adjustment;
-
-	GdkWindow *view_window;
-	GdkWindow *bin_window;
-
-	gint scroll_offset;
-	gint saved_scroll_offset;
-	gint scroll_step;
-
-	guint scroll_timeout;
-
-	guint needs_destruction_ref : 1;
-	guint torn_off              : 1;
-	/* The tearoff is active when it is torn off and the not-torn-off
-   * menu is not popped up.
-   */
-	guint tearoff_active        : 1;
-	guint scroll_fast           : 1;
-
-	guint upper_arrow_visible   : 1;
-	guint lower_arrow_visible   : 1;
-	guint upper_arrow_prelight  : 1;
-	guint lower_arrow_prelight  : 1;
-
-	guint have_position         : 1;
-	guint have_layout           : 1;
-	guint seen_item_enter       : 1;
-	guint ignore_button_release : 1;
-	guint no_toggle_size        : 1;
-	guint drag_already_pressed  : 1;
-	guint drag_scroll_started   : 1;
-
-	/* info used for the table */
-	guint *heights;
-	gint heights_length;
-	gint requested_height;
-
-	gboolean initially_pushed_in;
-	gint monitor_num;
-
-	/* Cached layout information */
-	gint n_rows;
-	gint n_columns;
-
-	gchar *title;
-
-	/* Arrow states */
-	GtkStateFlags lower_arrow_state;
-	GtkStateFlags upper_arrow_state;
-
-	/* navigation region */
-	gint navigation_x;
-	gint navigation_y;
-	gint navigation_width;
-	gint navigation_height;
-
-	guint navigation_timeout;
-
-	gdouble drag_start_y;
-	gint initial_drag_offset;
-};
-
-struct _GtkMenuShellPrivate
-{
-	GList *children;
-
-	GtkWidget *active_menu_item;
-	GtkWidget *parent_menu_shell;
-	void *tracker;
-
-	guint button;
-	guint32 activate_time;
-
-	guint active               : 1;
-	guint have_grab            : 1;
-	guint have_xgrab           : 1;
-	guint ignore_enter         : 1;
-	guint keyboard_mode        : 1;
-
-	guint take_focus           : 1;
-	guint activated_submenu    : 1;
-	guint in_unselectable_item : 1;
-};
-
-struct _GtkMenuItemPrivate
-{
-	GtkWidget *submenu;
-	GdkWindow *event_window;
-
-	guint16 toggle_size;
-	guint16 accelerator_width;
-
-	guint timer;
-
-	gchar  *accel_path;
-
-	GtkAction *action;
-	void *action_helper;
-
-	guint show_submenu_indicator : 1;
-	guint submenu_placement      : 1;
-	guint submenu_direction      : 1;
-	guint right_justify          : 1;
-	guint timer_from_keypress    : 1;
-	guint from_menubar           : 1;
-	guint use_action_appearance  : 1;
-	guint reserve_indicator      : 1;
-};
+#include "gtk3privates.h"
 #endif
 
 static gboolean
