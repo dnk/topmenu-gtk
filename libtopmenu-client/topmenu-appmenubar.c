@@ -85,21 +85,10 @@ static void topmenu_app_menu_bar_init(TopMenuAppMenuBar *self)
 	GtkCssProvider *provider = gtk_css_provider_new();
 	GtkStyleContext *style_context = gtk_widget_get_style_context(GTK_WIDGET(self));
 	static const char *css =
-	        "TopMenuAppMenuBar {\n"
-	        "	box-shadow: none;\n"
-	        "	padding: 0;\n"
-	        "	background-color: @os_chrome_bg_color;\n"
-			"	background-image: none;\n"
-			"	color: @os_chrome_fg_color;\n"
-	        "}\n"
-	        "\n"
-			"TopMenuAppMenuBar .menu .menuitem *:active {\n"
-	        "	color: @theme_text_color;\n"
-			"}\n"
-			"\n"
-			"TopMenuAppMenuBar .menu .menuitem *:selected {\n"
-	        "	color: @theme_selected_fg_color;\n"
-			"}\n";
+		"TopMenuAppMenuBar {\n"
+		"	box-shadow: none;\n"
+		"	padding: 0;\n"
+		"}\n";
 	if (gtk_css_provider_load_from_data(provider, css, -1, &error)) {
 		gtk_style_context_add_provider(style_context,
 		                               GTK_STYLE_PROVIDER(provider),
