@@ -39,7 +39,6 @@ struct _TopMenuMatePanelApplet
 {
 	MatePanelApplet parent_instance;
 	TopMenuWidget *menu_widget;
-	GdkWindow *cur_plug;
 	GtkActionGroup *actions;
 };
 
