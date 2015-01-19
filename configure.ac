@@ -97,6 +97,7 @@ AC_CONFIG_FILES([
 	libtopmenu-server/Makefile
 	module/Makefile
 	mate-applet/Makefile
+	icons/Makefile
 	test/Makefile
 ])
 
