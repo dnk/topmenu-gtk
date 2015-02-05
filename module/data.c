@@ -52,6 +52,7 @@ topmenu_is_window_blacklisted (GtkWindow *window)
 	switch (gtk_window_get_type_hint (window)) {
 	case GDK_WINDOW_TYPE_HINT_MENU:
 	case GDK_WINDOW_TYPE_HINT_TOOLBAR:
+	case GDK_WINDOW_TYPE_HINT_SPLASHSCREEN:
 	case GDK_WINDOW_TYPE_HINT_DOCK:
 	case GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU:
 	case GDK_WINDOW_TYPE_HINT_POPUP_MENU:
