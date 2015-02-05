@@ -49,6 +49,21 @@ topmenu_is_window_blacklisted (GtkWindow *window)
 	if (GTK_IS_PLUG (window))
 		return TRUE;
 
+	switch (gtk_window_get_type_hint (window)) {
+	case GDK_WINDOW_TYPE_HINT_MENU:
+	case GDK_WINDOW_TYPE_HINT_TOOLBAR:
+	case GDK_WINDOW_TYPE_HINT_DOCK:
+	case GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU:
+	case GDK_WINDOW_TYPE_HINT_POPUP_MENU:
+	case GDK_WINDOW_TYPE_HINT_TOOLTIP:
+	case GDK_WINDOW_TYPE_HINT_NOTIFICATION:
+	case GDK_WINDOW_TYPE_HINT_COMBO:
+	case GDK_WINDOW_TYPE_HINT_DND:
+		return TRUE;
+	default:
+		break;
+	}
+
 	return FALSE;
 }
 
