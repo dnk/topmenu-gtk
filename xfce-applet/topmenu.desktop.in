@@ -1,0 +1,7 @@
+[Xfce Panel]
+Type=X-XFCE-PanelPlugin
+Encoding=UTF-8
+Name=TopMenu
+Comment=Shows the topmenu menu bar
+Icon=topmenu-applet
+X-XFCE-Module=topmenu

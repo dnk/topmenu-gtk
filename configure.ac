@@ -31,6 +31,11 @@ AC_ARG_ENABLE([mate-applet],
 			  [],
 			  [enable_mate_applet=check])
 
+AC_ARG_ENABLE([xfce-applet],
+              [AS_HELP_STRING([--enable-xfce-applet], [build the Xfce panel applet @<:@default=check@:>@])],
+              [],
+              [enable_xfce_applet=check])
+
 AM_CONDITIONAL([GTK3], [test GTK$with_gtk = GTK3])
 AC_SUBST([GTK_VERSION], [$with_gtk])
 AC_DEFINE_UNQUOTED([GTK_VERSION], [$with_gtk], [Define to GTK major version used])
@@ -86,9 +91,21 @@ AS_IF([test "x$with_gtk" = x3],
 			[if test "x$enable_mate_applet" = xyes; then
 				AC_MSG_FAILURE([--enable-mate-applet was given, but test for libmatepanelapplet failed])
 			fi]
+		)])
+
+	AS_IF([test "x$enable_xfce_applet" != xno],
+		[PKG_CHECK_MODULES([XFCEPANELAPPLET], [libxfce4panel-1.0 >= 4.8],
+			[
+				AC_DEFINE([HAVE_XFCEPANELAPPLET], [1], [Define if you have libxfce4panel])
+				enable_xfce_applet=yes
+			],
+			[if test "x$enable_xfce_applet" = xyes; then
+				AC_MSG_FAILURE([--enable-xfce-applet was given, but test for libxfce4panel failed])
+			fi]
 		)])])
 
 AM_CONDITIONAL([WANT_MATE_APPLET], [test x$enable_mate_applet = xyes])
+AM_CONDITIONAL([WANT_XFCE_APPLET], [test x$enable_xfce_applet = xyes])
 
 # Output files
 AC_CONFIG_FILES([
@@ -97,6 +114,7 @@ AC_CONFIG_FILES([
 	libtopmenu-server/Makefile
 	module/Makefile
 	mate-applet/Makefile
+	xfce-applet/Makefile
 	icons/Makefile
 	test/Makefile
 ])
