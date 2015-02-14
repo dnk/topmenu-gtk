@@ -73,6 +73,14 @@ static void (* pre_hijacked_menu_bar_get_preferred_height_for_width) (GtkWidget 
                                                                       gint           *natural_height);
 #endif
 
+#if GTK_MAJOR_VERSION == 2
+static void (* pre_hijacked_menu_item_select)                        (GtkItem        *item);
+static void (* pre_hijacked_menu_item_deselect)                      (GtkItem        *item);
+#elif GTK_MAJOR_VERSION == 3
+static void (* pre_hijacked_menu_item_select)                        (GtkMenuItem    *item);
+static void (* pre_hijacked_menu_item_deselect)                      (GtkMenuItem    *item);
+#endif
+
 static void
 handle_should_hide_menubar_updated (GObject    *object,
                                     GParamSpec *pspec,
@@ -604,6 +612,73 @@ hijacked_menu_bar_get_preferred_height_for_width (GtkWidget *widget,
 }
 #endif
 
+static gboolean
+topmenu_should_allow_select_signal (GtkMenuItem *item)
+{
+	MenuItemData *item_data = topmenu_get_menu_item_data (item);
+	if (item_data)
+	{
+		GtkWidget *parent = gtk_widget_get_parent (GTK_WIDGET (item));
+		if (parent)
+		{
+			if (GTK_IS_MENU_BAR (parent) && topmenu_should_hide_menubar (parent))
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+#if GTK_MAJOR_VERSION == 2
+static void
+hijacked_menu_item_select (GtkItem *item)
+{
+	g_return_if_fail (GTK_IS_MENU_ITEM (item));
+	GtkMenuItem *menu_item = GTK_MENU_ITEM (item);
+
+	if (topmenu_should_allow_select_signal (menu_item))
+	{
+		if (pre_hijacked_menu_item_select)
+			(* pre_hijacked_menu_item_select) (item);
+	}
+}
+
+static void
+hijacked_menu_item_deselect (GtkItem *item)
+{
+	g_return_if_fail (GTK_IS_MENU_ITEM (item));
+	GtkMenuItem *menu_item = GTK_MENU_ITEM (item);
+
+	if (topmenu_should_allow_select_signal (menu_item))
+	{
+		if (pre_hijacked_menu_item_deselect)
+			(* pre_hijacked_menu_item_deselect) (item);
+	}
+}
+#elif GTK_MAJOR_VERSION == 3
+static void
+hijacked_menu_item_select (GtkMenuItem *item)
+{
+	if (topmenu_should_allow_select_signal (item))
+	{
+		if (pre_hijacked_menu_item_select)
+			(* pre_hijacked_menu_item_select) (item);
+	}
+}
+
+static void
+hijacked_menu_item_deselect (GtkMenuItem *item)
+{
+	if (topmenu_should_allow_select_signal (item))
+	{
+		if (pre_hijacked_menu_item_deselect)
+			(* pre_hijacked_menu_item_deselect) (item);
+	}
+}
+#endif
+
 static void
 hijack_window_class_vtable (GType type)
 {
@@ -676,6 +751,28 @@ hijack_menu_bar_class_vtable (GType type)
 	g_free (children);
 }
 
+static void
+hijack_menu_item_class_vtable (GType type)
+{
+#if GTK_MAJOR_VERSION == 2
+	GtkItemClass *item_class = g_type_class_ref (type);
+#elif GTK_MAJOR_VERSION == 3
+	GtkMenuItemClass *item_class = g_type_class_ref (type);
+#endif
+	if (item_class->select == pre_hijacked_menu_item_select)
+		item_class->select = hijacked_menu_item_select;
+	if (item_class->deselect == pre_hijacked_menu_item_select)
+		item_class->deselect = hijacked_menu_item_deselect;
+
+	guint n, i;
+	GType *children = g_type_children (type, &n);
+
+	for (i = 0; i < n; i++)
+		hijack_menu_item_class_vtable (children[i]);
+
+	g_free (children);
+}
+
 G_MODULE_EXPORT
 void gtk_module_init(void)
 {
@@ -717,6 +814,16 @@ void gtk_module_init(void)
 		pre_hijacked_menu_bar_get_preferred_height_for_width = widget_class->get_preferred_height_for_width;
 #endif
 		hijack_menu_bar_class_vtable (GTK_TYPE_MENU_BAR);
+
+		/* intercept select/deselect vcalls on GtkMenuItem (for proxying without showing submenu) */
+#if GTK_MAJOR_VERSION == 2
+		GtkItemClass *item_class = g_type_class_ref (GTK_TYPE_MENU_ITEM);
+#elif GTK_MAJOR_VERSION == 3
+		GtkMenuItemClass *item_class = g_type_class_ref (GTK_TYPE_MENU_ITEM);
+#endif
+		pre_hijacked_menu_item_select = item_class->select;
+		pre_hijacked_menu_item_deselect = item_class->deselect;
+		hijack_menu_item_class_vtable (GTK_TYPE_MENU_ITEM);
 	}
 }
 

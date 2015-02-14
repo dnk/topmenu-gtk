@@ -499,6 +499,8 @@ static void handle_proxy_select(GtkMenuItem *proxy, GtkMenuItem *item)
 	GtkWidget *submenu = gtk_menu_item_get_submenu(item);
 	GtkWidget *parent = gtk_widget_get_parent(GTK_WIDGET(proxy));
 
+	g_signal_emit_by_name(item, "select", NULL);
+
 	if (submenu && parent) {
 		if (!gtk_widget_is_sensitive(GTK_WIDGET(submenu)))
 			return;
@@ -534,6 +536,8 @@ static void handle_proxy_select(GtkMenuItem *proxy, GtkMenuItem *item)
 static void handle_proxy_deselect(GtkMenuItem *proxy, GtkMenuItem *item)
 {
 	GtkWidget *submenu = gtk_menu_item_get_submenu(item);
+
+	g_signal_emit_by_name(item, "deselect", NULL);
 
 	if (submenu) {
 		g_signal_handlers_disconnect_by_func(submenu, handle_menu_leave_notify, item);
