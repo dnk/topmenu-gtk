@@ -10,6 +10,7 @@ config.h
 mate-applet/com.javispedro.topmenu.MatePanelApplet.mate-panel-applet
 mate-applet/org.mate.panel.applet.TopMenuMatePanelAppletFactory.service
 mate-applet/topmenu-mate-panel-applet
+xfce-applet/topmenu.desktop
 test/client
 test/server
 missing
