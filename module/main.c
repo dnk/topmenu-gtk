@@ -244,7 +244,15 @@ handle_shell_insert (GtkMenuShell *menu_shell, GtkWidget *child, gint position, 
 	gint offset = compute_shell_position_in_appmenu (window_data, menu_shell);
 	g_return_if_fail (offset >= 0);
 
-	add_menu_item_to_appmenu (window_data, item, offset + position);
+	if (position < 0) {
+		// Gtk internally handles position=-1 as "append".
+		// So we add this item after all the other items from this shell
+		gint n_items = count_container_items (GTK_CONTAINER (menu_shell)) - 1;
+		// -1 because count_container_items will count the item we're just adding
+		add_menu_item_to_appmenu (window_data, item, offset + n_items);
+	} else {
+		add_menu_item_to_appmenu (window_data, item, offset + position);
+	}
 }
 
 static void
