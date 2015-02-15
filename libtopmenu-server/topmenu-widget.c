@@ -208,8 +208,12 @@ static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window wind
 		}
 	}
 
+#if GTK_VERSION == 2
+	/* Seems that we might be adding the new plug before actually letting
+	 * the socket receive the reparentnotify from above. */
 	g_clear_object(&self->socket->plug_window);
 	self->socket->current_width = self->socket->current_height = 0;
+#endif
 
 	if (window) {
 		g_debug("Embedding window 0x%lx", window);
@@ -418,7 +422,10 @@ static void topmenu_widget_size_allocate(GtkWidget *widget, GtkAllocation *alloc
 	TopMenuWidget *self = TOPMENU_WIDGET(widget);
 	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
 	if (self->socket) {
+#if GTK_VERSION == 2
+		/* Force a resize of the plug window */
 		self->socket->current_width = self->socket->current_height = 0;
+#endif
 		gtk_widget_size_allocate(GTK_WIDGET(self->socket), allocation);
 	}
 }
