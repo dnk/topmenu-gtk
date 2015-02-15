@@ -232,13 +232,22 @@ static gboolean topmenu_widget_follow_window(TopMenuWidget *self, Window window)
 		return FALSE; // Ignore the window this widget is on as a candidate
 	}
 
-	// Add this window to the list of windows we are following
-	g_queue_push_head(&self->priv->followed_windows, GSIZE_TO_POINTER(window));
-
+	gdk_error_trap_push();
 	XWindowAttributes win_attrs;
 	if (XGetWindowAttributes(dpy, window, &win_attrs)) {
-		XSelectInput(dpy, window, win_attrs.your_event_mask | PropertyChangeMask);
+		long event_mask =  win_attrs.your_event_mask | StructureNotifyMask | PropertyChangeMask;
+		if (event_mask != win_attrs.your_event_mask) {
+			XSelectInput(dpy, window, event_mask);
+		}
 	}
+	gdk_flush();
+	if (gdk_error_trap_pop()) {
+		g_debug("got error while trying to follow window 0x%lx", window);
+		return FALSE; // Assume window has been destroyed.
+	}
+
+	// Add this window to the list of windows we are following
+	g_queue_push_head(&self->priv->followed_windows, GSIZE_TO_POINTER(window));
 
 	if (topmenu_widget_try_window(self, window)) {
 		// Found a menu bar on this window

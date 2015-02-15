@@ -106,10 +106,6 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 		                        G_CALLBACK(handle_widget_button_event), plug, 0);
 	gtk_widget_show(GTK_WIDGET(plug));
 
-	// Gtk+ should keep a reference to plug as it is a "top level" widget.
-	// Otherwise I failed to parse the documentation.
-	g_warn_if_fail(G_OBJECT(plug)->ref_count == 1);
-
 	Window plug_xwin = gtk_plug_get_id(plug);
 
 	Atom atom = XInternAtom(display, ATOM_TOPMENU_WINDOW, False);
