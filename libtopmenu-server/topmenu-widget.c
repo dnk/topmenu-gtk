@@ -194,12 +194,22 @@ static void topmenu_widget_embed_topmenu_window(TopMenuWidget *self, Window wind
 
 		// Otherwise, disembed the current client
 		g_debug("Disembedding window 0x%lx", GDK_WINDOW_XID(cur));
+		gdk_error_trap_push();
 		gdk_window_hide(cur);
 
 		// Reparent back to root window to end embedding
 		GdkScreen *screen = gdk_window_get_screen(cur);
 		gdk_window_reparent(cur, gdk_screen_get_root_window(screen), 0, 0);
+
+		gdk_flush();
+		if (gdk_error_trap_pop()) {
+			g_debug("error while disembedding window");
+			// Assume it's destroyed, so continue.
+		}
 	}
+
+	g_clear_object(&self->socket->plug_window);
+	self->socket->current_width = self->socket->current_height = 0;
 
 	if (window) {
 		g_debug("Embedding window 0x%lx", window);
@@ -406,10 +416,11 @@ static void topmenu_widget_unmap(GtkWidget *widget)
 static void topmenu_widget_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 {
 	TopMenuWidget *self = TOPMENU_WIDGET(widget);
+	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
 	if (self->socket) {
+		self->socket->current_width = self->socket->current_height = 0;
 		gtk_widget_size_allocate(GTK_WIDGET(self->socket), allocation);
 	}
-	GTK_WIDGET_CLASS(topmenu_widget_parent_class)->size_allocate(widget, allocation);
 }
 
 #if GTK_MAJOR_VERSION == 3
