@@ -65,11 +65,15 @@ static Window read_window_property(Display *dpy, Window window, Atom property)
 	int actual_format;
 	unsigned long nitems, bytes_after;
 	unsigned char *prop_return;
+	Status status;
 
-	if (XGetWindowProperty(dpy, window, property,
-	                       0, sizeof(Window), False,
-	                       XA_WINDOW, &actual_type, &actual_format, &nitems,
-	                       &bytes_after, &prop_return) == Success) {
+	gdk_error_trap_push();
+	status = XGetWindowProperty(dpy, window, property,
+	                            0, sizeof(Window), False,
+	                            XA_WINDOW, &actual_type, &actual_format, &nitems,
+	                            &bytes_after, &prop_return);
+
+	if (gdk_error_trap_pop() == 0 && status == Success) {
 		if (prop_return && actual_type == XA_WINDOW) {
 			return *(Window*)prop_return;
 		}
@@ -127,6 +131,29 @@ static Window topmenu_widget_get_session_leader(TopMenuWidget *self, Window wind
 	MatewnckWindow *w = matewnck_window_get(window);
 	if (w) {
 		return matewnck_window_get_group_leader(w);
+	}
+#endif
+	return None;
+}
+
+static Window topmenu_widget_get_window_transient(TopMenuWidget *self, Window window)
+{
+#ifdef HAVE_WNCK
+	WnckWindow *w = wnck_window_get(window);
+	if (w) {
+		WnckWindow *t = wnck_window_get_transient(w);
+		if (t) {
+			return wnck_window_get_xid(t);
+		}
+	}
+#endif
+#ifdef HAVE_MATEWNCK
+	MatewnckWindow *w = matewnck_window_get(window);
+	if (w) {
+		MatewnckWindow *t = matewnck_window_get_transient(w);
+		if (t) {
+			return matewnck_window_get_xid(t);
+		}
 	}
 #endif
 	return None;
@@ -268,8 +295,8 @@ static gboolean topmenu_widget_follow_window(TopMenuWidget *self, Window window)
 		return TRUE;
 	} else {
 		// This window had no menu bar, so let's check its transient_for windows.
-		Window transient_for;
-		if (XGetTransientForHint(dpy, window, &transient_for)) {
+		Window transient_for = topmenu_widget_get_window_transient(self, window);
+		if (transient_for && transient_for != window) {
 			if (topmenu_widget_follow_window(self, transient_for)) {
 				return TRUE;
 			}
