@@ -1,4 +1,4 @@
-# Screenshots #
+# Screenshots
 
 ![](https://pbs.twimg.com/media/Be2QBA9CQAEYosy.png)
 
@@ -6,13 +6,13 @@
 
 ![](http://depot.javispedro.com/mate/topmenu/thunderbird.png)
 
-# Requirements and compatibility #
+# Requirements and compatibility
 
 Currently, TopMenu ships as a panel applet for either Mate 1.8 or Xfce >= 4.8 (Gtk+2 versions only). The Mate applet would be relatively easy to port to Gnome 2.
 
 Gtk+2 is the preferred toolkit, albeit Gtk+3 is partially supported. Additionally, plugins are shipped for Qt 4 and some Mozilla apps (Firefox, Thunderbird and Zotero). Note that, except in the Gtk+ 3 case, menu bars will always be rendered using the Gtk+ 2 theme.
 
-# Install #
+# Install
 
 `autoreconf --install`, `./configure --prefix=/usr`, `make` and `sudo make install` should work for topmenu-gtk. Then add the panel applet. You need to ensure the Gtk+ module `topmenu-gtk-module`is loaded. A simple way to do this is to create a `.gtkrc-2.0` file in your `$HOME` with the following contents:
 
@@ -26,7 +26,19 @@ topmenu-qt ships with a qmake .pro file. Installation should be as simple as `qm
 
 The Mozilla extension can be built using `make`. Being a pure javascript extension, it should not be hard to build. Install the resulting .xpi file using the normal methods (e.g. drag and drop into the "Extensions" dialog).
 
-# Design #
+# Bugs and feature requests
+
+While I'm looking for a simple enough issue tracker,
+please send questions or problem reports to dev.bugs at javispedro com. Alternatively, see [my contact page](http://javispedro.com/me.html).
+
+## Longer-term feature ideas
+
+* Multi-monitor support. Currently only one applet instance is supported.  Ideally, IF there are multiple panel applets, they should synchronize to only embed menubars from the same display.
+* Allow Qt programs to render the menubars using Qt itself instead of using Gtk+.
+* Transparent panels without XComposite (relative X11 background pixmaps, maybe?)
+* Add some toggables for some commonely requested options: hide/show the application menu, "menu button" instead of menu bar.
+
+# Design
 
 TopMenu uses XEmbed instead of other approaches. Thus, the global menubar is actually rendered by each client process, but the menubar applet _embeds_ it, giving the appearence that the menubar is on a different place. This is the way e.g. OS X works, and it works quite well for me.
 
@@ -38,16 +50,9 @@ Most alternative approaches for global menu bars _serialize_ menubars into a a m
 I tried to hack around Canonical's dbusmenu to use X11 as IPC but that was an exercise in futility as X11 is just useless as an IPC mechanism. 
 Besides, at the time this document was written, even with the use of dbusmenu (now upstreamed in GIO itself) I would need to supply patches for virtually every toolkit (including Gtk+3), negating the benefits of using a "upstreamed" protocol.
 
-## Protocol ##
+## Protocol
 
 Every X11 toplevel window with a menubar _should_ have a property with name `TOPMENU_WINDOW` (format = Window) containing a single reference to a different X11 window, called the _menu window_. This menu window _must_ support acting as a [XEmbed](http://standards.freedesktop.org/xembed-spec/xembed-spec-latest.html) client. The active TopMenu server, may, at any time, start an XEmbed session by embedding the menu window. Only one TopMenu server may embed this window at any given time.
 
 A active topmenu server will always own the X11 selection named `TOPMENU_SERVER`. If such a selection exists, an application _must_ assume that a server is currently embedding the menu window (even if no XEmbed session is active) and thus _must_ hide its native menubar, if any.
-
-# Tasks (TBD)
-
-* Multi-monitor support. Currently only one applet instance is supported.  Ideally, IF there are multiple panel applets, they should synchronize to only embed menubars from the same display.
-* Possibly allow Qt programs to render the menubars using Qt itself instead of using Gtk+.
-* Transparent panels without XComposite (relative X11 background pixmaps, maybe?)
-* Add some toggables for some commonely requested options: hide/show the application menu, "menu button" instead of menu bar.
 
