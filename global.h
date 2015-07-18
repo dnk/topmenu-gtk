@@ -12,7 +12,11 @@
 #define ATOM_TOPMENU_SERVER_SELECTION "_TOPMENU_SERVER"
 
 /* Gobject data keys */
+/** For a GtkWindow, stores its associated TopMenu GtkPlug */
 #define OBJECT_DATA_KEY_PLUG "topmenu-plug"
+
+/** For a server widget, stores the associated stub window.
+    This is the window that might own ATOM_TOPMENU_SERVER_SELECTION. */
 #define OBJECT_DATA_KEY_SERVER_STUB "topmenu-server-stub"
 
 #endif
