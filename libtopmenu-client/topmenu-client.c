@@ -28,8 +28,6 @@
 
 #include "topmenu-client.h"
 
-#define OBJECT_DATA_KEY_PLUG "topmenu-plug"
-
 static gboolean handle_plug_delete(GtkPlug *plug, GdkEvent *event, GdkWindow *window)
 {
 	return TRUE; // Prevent deletion of plug window
