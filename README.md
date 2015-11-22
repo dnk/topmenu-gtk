@@ -8,7 +8,7 @@
 
 # Requirements and compatibility
 
-Currently, TopMenu ships as a panel applet for either Mate 1.8 or Xfce >= 4.8 (Gtk+2 versions only). The Mate applet would be relatively easy to port to Gnome 2.
+Currently, TopMenu ships as a panel applet for either Mate 1.8, Xfce >= 4.8 (Gtk+2 versions only), or LXPanel. The Mate applet would be relatively easy to port to Gnome 2.
 
 Gtk+2 is the preferred toolkit, albeit Gtk+3 is partially supported. Additionally, plugins are shipped for Qt 4 and some Mozilla apps (Firefox, Thunderbird and Zotero). Note that, except in the Gtk+ 3 case, menu bars will always be rendered using the Gtk+ 2 theme.
 
