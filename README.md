@@ -14,13 +14,19 @@ Gtk+2 is the preferred toolkit, albeit Gtk+3 is partially supported. Additionall
 
 # Install
 
-`autoreconf --install`, `./configure --prefix=/usr`, `make` and `sudo make install` should work for topmenu-gtk. Then add the panel applet. You need to ensure the Gtk+ module `topmenu-gtk-module`is loaded. A simple way to do this is to create a `.gtkrc-2.0` file in your `$HOME` with the following contents:
+`autoreconf --install`, `./configure --prefix=/usr`, `make` and `sudo make install` should work for topmenu-gtk. Then add the panel applet. You need to ensure the Gtk+ module `topmenu-gtk-module` is loaded. A simple way to do this is to create a `.gtkrc-2.0` file in your `$HOME` with the following contents:
 
     gtk-modules = "canberra-gtk-module:topmenu-gtk-module"
 
 ![The current icon](https://git.javispedro.com/cgit/topmenu-gtk.git/plain/icons/48x48/topmenu-applet.png) Look for this icon in the Mate/Xfce "Add panel applet" dialogs.
 
-For Gtk+3 , use `./configure --prefix=/usr --with-gtk=3`. Because of a [gtk bug](https://bugzilla.gnome.org/show_bug.cgi?id=730306) in Gtk+ 3.12, you may need to use a different method to load modules, such as globally setting environment variable `GTK_MODULES`.
+For Gtk+3 , use `./configure --prefix=/usr --with-gtk=3`. Autoloading `topmenu-gtk-module` is
+also possible by creating a `settings.ini` file in `$HOME/.config/gtk-3.0` with:
+
+    [Settings]
+    gtk-modules = topmenu-gtk-module
+
+Alternatively, you may create the gtkrc files in /etc or set environment variable `GTK_MODULES`. Check the Gtk+ documentation for further information.
 
 topmenu-qt ships with a qmake .pro file. Installation should be as simple as `qmake`, `make`, and `sudo make install`. No additional changes are required.
 
