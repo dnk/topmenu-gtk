@@ -60,9 +60,10 @@ static void update_selection_owner(guint32 time)
 
 	GdkWindow *cur_owner = gdk_selection_owner_get(selection_atom);
 	if (cur_owner != our_owner) {
-		g_debug("Setting this process as owner of the selection");
-		int res = gdk_selection_owner_set(our_owner, selection_atom, time, TRUE);
-		g_debug("Result = %d", res);
+		g_debug("Setting this server as current TopMenu server");
+		if (!gdk_selection_owner_set(our_owner, selection_atom, time, TRUE)) {
+			g_warning("Could not set this server as TopMenu server");
+		}
 	}
 }
 
