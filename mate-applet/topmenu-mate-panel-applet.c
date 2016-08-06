@@ -24,11 +24,6 @@
 
 G_DEFINE_TYPE(TopMenuMatePanelApplet, topmenu_mate_panel_applet, PANEL_TYPE_APPLET)
 
-static void display_preferences_dialog(GtkAction *action, TopMenuMatePanelApplet *self)
-{
-	// TODO
-}
-
 static void display_about_dialog(GtkAction *action, TopMenuMatePanelApplet *self)
 {
 	GtkWindow *parent = NULL;
@@ -37,15 +32,19 @@ static void display_about_dialog(GtkAction *action, TopMenuMatePanelApplet *self
 		parent = GTK_WINDOW(parent_widget);
 	}
 
+	static const char *authors[] = {
+		"Javier S. Pedro <dev.bugs@javispedro.com>",
+		NULL};
+
 	gtk_show_about_dialog(parent,
 	                      "program-name", "TopMenu Mate Panel Applet",
+	                      "logo-icon-name", "topmenu-applet",
+	                      "website", "https://git.javispedro.com/cgit/topmenu-gtk.git/about/",
+	                      "authors", authors,
 	                      NULL);
 }
 
 static const GtkActionEntry menu_verbs[] = {
-	{ "TopMenuPreferences", GTK_STOCK_PROPERTIES, N_("_Preferences"),
-	  NULL, NULL,
-	  G_CALLBACK (display_preferences_dialog) },
 	{ "TopMenuAbout", GTK_STOCK_ABOUT, N_("_About"),
 	  NULL, NULL,
 	  G_CALLBACK (display_about_dialog) }
