@@ -1,6 +1,7 @@
 *.creator.user
 *.am.user
 config.h
+config.h.in
 .deps
 .libs
 *~
