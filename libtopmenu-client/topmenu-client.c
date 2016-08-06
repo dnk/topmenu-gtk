@@ -35,28 +35,34 @@ static gboolean handle_plug_delete(GtkPlug *plug, GdkEvent *event, GdkWindow *wi
 
 static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, GtkPlug *plug)
 {
+	// To allow for e.g. panel applets to capture middle- and right-click
+	// button presses, we have to manually forward them to our current
+	// socket window
+
 	if (event->type != GDK_BUTTON_PRESS && event->type != GDK_BUTTON_RELEASE) {
 		return FALSE;
 	}
 	if (event->button.button == 1) {
+		// Let the menubar keep left-click button presses.
 		return FALSE;
 	}
 
 	GdkWindow *socket = gtk_plug_get_socket_window(plug);
 	if (socket) {
-		GdkDisplay * display = gdk_window_get_display(socket);
+		GdkDisplay *display = gdk_window_get_display(socket);
 		GdkScreen *screen = gdk_window_get_screen(socket);
 		GdkWindow *root = gdk_screen_get_root_window(screen);
 		Display *dpy = GDK_DISPLAY_XDISPLAY(display);
 		Window xwin = GDK_WINDOW_XID(socket);
 
 		if (event->type == GDK_BUTTON_PRESS) {
+			// X11 will do an automatic pointer grab on a press,
+			// but we want the parent to be able to it instead.
 			gdk_display_pointer_ungrab(gtk_widget_get_display(widget),
-									   GDK_CURRENT_TIME);
+			                           GDK_CURRENT_TIME);
 		}
 
 		XEvent e;
-		long mask = event->type == GDK_BUTTON_PRESS ? ButtonPressMask : ButtonReleaseMask;
 		e.type = event->type == GDK_BUTTON_PRESS ? ButtonPress : ButtonRelease;
 		e.xbutton.window = xwin;
 		e.xbutton.display = dpy;
@@ -71,11 +77,11 @@ static gboolean handle_widget_button_event(GtkWidget *widget, GdkEvent *event, G
 		e.xbutton.same_screen = True;
 
 		gdk_error_trap_push();
-		XSendEvent(dpy, xwin, True, mask, &e);
+		XSendEvent(dpy, xwin, False, NoEventMask, &e);
 		g_debug("Forwarding button %d %s event to 0x%lx",
-				e.xbutton.button,
-				event->type == GDK_BUTTON_PRESS ? "press" : "release",
-				xwin);
+		        e.xbutton.button,
+		        event->type == GDK_BUTTON_PRESS ? "press" : "release",
+		        xwin);
 		gdk_flush();
 		gdk_error_trap_pop();
 
@@ -99,9 +105,9 @@ void topmenu_client_connect_window_widget(GdkWindow *window, GtkWidget *widget)
 	g_signal_connect_object(plug, "delete-event",
 	                        G_CALLBACK(handle_plug_delete), window, 0);
 	g_signal_connect_object(widget, "button-press-event",
-		                        G_CALLBACK(handle_widget_button_event), plug, 0);
+	                        G_CALLBACK(handle_widget_button_event), plug, 0);
 	g_signal_connect_object(widget, "button-release-event",
-		                        G_CALLBACK(handle_widget_button_event), plug, 0);
+	                        G_CALLBACK(handle_widget_button_event), plug, 0);
 	gtk_widget_show(GTK_WIDGET(plug));
 
 	Window plug_xwin = gtk_plug_get_id(plug);
