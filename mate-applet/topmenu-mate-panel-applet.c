@@ -111,7 +111,6 @@ static void topmenu_mate_panel_applet_init(TopMenuMatePanelApplet *self)
 	mate_panel_applet_set_flags(MATE_PANEL_APPLET(self),
 	                            MATE_PANEL_APPLET_EXPAND_MINOR);
 	mate_panel_applet_setup_menu(MATE_PANEL_APPLET(self),
-	                             "<menuitem name=\"TopMenu Preferences Item\" action=\"TopMenuPreferences\"/>"
 	                             "<menuitem name=\"TopMenu About Item\" action=\"TopMenuAbout\"/>",
 	                             action_group);
 
