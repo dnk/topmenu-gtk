@@ -31,6 +31,8 @@ G_BEGIN_DECLS
 #define TOPMENU_IS_MONITOR_CLASS(c)    (G_TYPE_CHECK_CLASS_TYPE((c), TOPMENU_TYPE_MONITOR))
 #define TOPMENU_MONITOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), TOPMENU_TYPE_MONITOR, TopMenuMonitorClass))
 
+/** The monitor object can be used to detect whether there is a TopMenu applet
+    on the current default display, and to be notified when the applet dies. */
 typedef struct _TopMenuMonitor        TopMenuMonitor;
 typedef struct _TopMenuMonitorClass   TopMenuMonitorClass;
 typedef struct _TopMenuMonitorPrivate TopMenuMonitorPrivate;
@@ -51,6 +53,8 @@ GType topmenu_monitor_get_type(void);
 
 TopMenuMonitor * topmenu_monitor_get_instance(void);
 
+/** Returns TRUE if there is a TopMenu applet on the current default display.
+    Subscribe to the property notification signal to monitor changes. */
 gboolean topmenu_monitor_is_topmenu_available(TopMenuMonitor * self);
 
 G_END_DECLS

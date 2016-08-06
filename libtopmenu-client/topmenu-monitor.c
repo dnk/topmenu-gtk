@@ -55,10 +55,10 @@ static GdkFilterReturn handle_cur_server_event(GdkXEvent *xevent, GdkEvent *even
 {
 	XEvent *e = (XEvent*)xevent;
 	if (e->type == DestroyNotify) {
-		g_debug("Current server has been destroyed");
 		TopMenuMonitor *self = TOPMENU_MONITOR(data);
 		if (self->priv->cur_server &&
 		        GDK_WINDOW_XID(self->priv->cur_server) == e->xdestroywindow.window) {
+			g_debug("Current server has been destroyed");
 			topmenu_monitor_update(self);
 		}
 	}
@@ -71,13 +71,14 @@ static void topmenu_monitor_set_cur_server(TopMenuMonitor *self, GdkWindow *wind
 		// Nothing to do
 		return;
 	}
-	g_debug("Setting current server to 0x%lx", GDK_WINDOW_XID(window));
 	if (self->priv->cur_server) {
+		g_debug("Removing current server");
 		gdk_window_remove_filter(window, handle_cur_server_event, self);
 		g_object_unref(self->priv->cur_server);
 		self->priv->cur_server = 0;
 	}
 	if (window) {
+		g_debug("Setting current server to 0x%lx", GDK_WINDOW_XID(window));
 		gdk_window_set_events(window, gdk_window_get_events(window) | GDK_STRUCTURE_MASK);
 		gdk_window_add_filter(window, handle_cur_server_event, self);
 		self->priv->cur_server = window;
