@@ -60,6 +60,23 @@ static void topmenu_mate_panel_applet_size_allocate(GtkWidget *widget, GtkAlloca
 	GTK_WIDGET_CLASS(topmenu_mate_panel_applet_parent_class)->size_allocate(widget, allocation);
 }
 
+#if GTK_MAJOR_VERSION == 3
+static void topmenu_mate_panel_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width)
+{
+	TopMenuMatePanelApplet *self = TOPMENU_MATE_PANEL_APPLET(widget);
+	if (self->menu_widget) {
+		gtk_widget_get_preferred_width(GTK_WIDGET(self->menu_widget), minimal_width, natural_width);
+	}
+}
+
+static void topmenu_mate_panel_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height)
+{
+	TopMenuMatePanelApplet *self = TOPMENU_MATE_PANEL_APPLET(widget);
+	if (self->menu_widget) {
+		gtk_widget_get_preferred_height(GTK_WIDGET(self->menu_widget), minimal_height, natural_height);
+	}
+}
+#elif GTK_MAJOR_VERSION == 2
 static void topmenu_mate_panel_applet_size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
 	TopMenuMatePanelApplet *self = TOPMENU_MATE_PANEL_APPLET(widget);
@@ -67,12 +84,18 @@ static void topmenu_mate_panel_applet_size_request(GtkWidget *widget, GtkRequisi
 		gtk_widget_size_request(GTK_WIDGET(self->menu_widget), requisition);
 	}
 }
+#endif
 
 static void topmenu_mate_panel_applet_class_init(TopMenuMatePanelAppletClass *klass)
 {
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	widget_class->size_allocate = topmenu_mate_panel_applet_size_allocate;
+#if GTK_MAJOR_VERSION == 3
+	widget_class->get_preferred_width = topmenu_mate_panel_get_preferred_width;
+	widget_class->get_preferred_height = topmenu_mate_panel_get_preferred_height;
+#elif GTK_MAJOR_VERSION == 2
 	widget_class->size_request = topmenu_mate_panel_applet_size_request;
+#endif
 }
 
 static void topmenu_mate_panel_applet_init(TopMenuMatePanelApplet *self)

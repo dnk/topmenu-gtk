@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT(libtopmenu-gtk, 1.0, javier@javispedro.com)
+AC_INIT(libtopmenu-gtk, 0.3, dev.bugs@javispedro.com)
 AC_CONFIG_SRCDIR([libtopmenu-server/topmenu-server.h])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign])
@@ -69,7 +69,18 @@ AS_IF([test "x$with_gtk" = x3],
 			[if test "x$with_wnck" = xwnck3; then
 				AC_MSG_FAILURE([--with-wnck=wnck3 was given, but test for libwnck-3.0 failed])
 			fi]
+		)])
+	AS_IF([test "x$enable_mate_applet" != xno],
+		[PKG_CHECK_MODULES([MATEPANELAPPLET], [libmatepanelapplet-4.0 >= 1.12],
+			[
+				AC_DEFINE([HAVE_MATEPANELAPPLET], [1], [Define if you have libmatepanelapplet])
+				enable_mate_applet=yes
+			],
+			[if test "x$enable_mate_applet" = xyes; then
+				AC_MSG_FAILURE([--enable-mate-applet was given, but test for libmatepanelapplet failed])
+			fi]
 		)])],
+
 
 	[AS_IF([test "x$with_wnck" = xwnck1 -o "x$with_wnck" = xcheck],
 		[PKG_CHECK_MODULES([WNCK1], [libwnck-1.0],
@@ -91,7 +102,6 @@ AS_IF([test "x$with_gtk" = x3],
 				AC_MSG_FAILURE([--with-wnck=matewnck was given, but test for libmatewnck failed])
 			fi]
 		)])
-
 	AS_IF([test "x$enable_mate_applet" != xno],
 		[PKG_CHECK_MODULES([MATEPANELAPPLET], [libmatepanelapplet-4.0],
 			[
@@ -102,7 +112,6 @@ AS_IF([test "x$with_gtk" = x3],
 				AC_MSG_FAILURE([--enable-mate-applet was given, but test for libmatepanelapplet failed])
 			fi]
 		)])
-
 	AS_IF([test "x$enable_xfce_applet" != xno],
 		[PKG_CHECK_MODULES([XFCEPANELAPPLET], [libxfce4panel-1.0 >= 4.8],
 			[
@@ -113,7 +122,6 @@ AS_IF([test "x$with_gtk" = x3],
 				AC_MSG_FAILURE([--enable-xfce-applet was given, but test for libxfce4panel failed])
 			fi]
 		)])
-
 	AS_IF([test "x$enable_lxpanel_plugin" != xno],
 		[PKG_CHECK_MODULES([LXPANELPLUGIN], [lxpanel >= 0.8.0 libfm >= 1.2.3],
 			[
