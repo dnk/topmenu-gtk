@@ -64,7 +64,7 @@ AS_IF([test "x$with_gtk" = x3],
 		[PKG_CHECK_MODULES([WNCK3], [libwnck-3.0],
 			[
 				AC_DEFINE([HAVE_WNCK3], [1], [Define if you have libwnck-3.0])
-				with_wnck=libwnck3
+				with_wnck=wnck3
 			],
 			[if test "x$with_wnck" = xwnck3; then
 				AC_MSG_FAILURE([--with-wnck=wnck3 was given, but test for libwnck-3.0 failed])
@@ -81,12 +81,12 @@ AS_IF([test "x$with_gtk" = x3],
 			fi]
 		)])],
 
-
+	dnl # ![test "x$with_gtk" = x3]
 	[AS_IF([test "x$with_wnck" = xwnck1 -o "x$with_wnck" = xcheck],
 		[PKG_CHECK_MODULES([WNCK1], [libwnck-1.0],
 			[
 				AC_DEFINE([HAVE_WNCK1], [1], [Define if you have libwnck-1.0])
-				with_wnck=libwnck1
+				with_wnck=wnck1
 			],
 			[if test "x$with_wnck" = xwnck1; then
 				AC_MSG_FAILURE([--with-wnck=wnck1 was given, but test for libwnck-1.0 failed])
