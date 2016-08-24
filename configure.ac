@@ -58,6 +58,7 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 PKG_CHECK_MODULES([GTK], [gtk+-x11-$with_gtk.0])
+PKG_CHECK_MODULES([X11], [x11])
 
 AS_IF([test "x$with_gtk" = x3],
 	[AS_IF([test "x$with_wnck" = xwnck3 -o "x$with_wnck" = xcheck],
