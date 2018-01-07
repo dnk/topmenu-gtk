@@ -59,7 +59,9 @@ static void init_static_data()
 }
 
 #if GTK_MAJOR_VERSION == 3
-#include "gtk3privates.h"
+#include "gtk/gtkmenushellprivate.h"
+#include "gtk/gtkmenuprivate.h"
+#include "gtk/gtkmenuitemprivate.h"
 #endif
 
 static gboolean

@@ -21,6 +21,10 @@ AC_ARG_WITH([gtk-module-dir],
             [AS_HELP_STRING([--with-gtk-module-dir=DIR], [GTK+ module directory [default=`pkg-config --variable=libdir gtk+-3.0`/gtk-3.0/modules]])],
 			[],
 			[with_gtk_module_dir=$with_gtk_libdir/gtk-$with_gtk.0/modules])
+AC_ARG_WITH([gtk-srcdir],
+            [AS_HELP_STRING([--with-gtk-srcdir=DIR], [GTK+ source directory (only for GTK+ 3)])],
+			[],
+			[with_gtk_srcdir=])
 AC_ARG_WITH([lxpanel-plugin-dir],
             [AS_HELP_STRING([--with-lxpanel-plugin-dir=DIR], [LXPanel plugin directory [default=`pkg-config --variable=pluginsdir lxpanel`]])],
 			[],
@@ -61,7 +65,10 @@ PKG_CHECK_MODULES([GTK], [gtk+-x11-$with_gtk.0])
 PKG_CHECK_MODULES([X11], [x11])
 
 AS_IF([test "x$with_gtk" = x3],
-	[AS_IF([test "x$with_wnck" = xwnck3 -o "x$with_wnck" = xcheck],
+	[AS_IF([test "x$with_gtk_srcdir" = x],
+		[AC_MSG_FAILURE([--with-gtk-srcdir was not specified.])],
+		[GTK_CFLAGS="-I$with_gtk_srcdir $GTK_CFLAGS"])
+	AS_IF([test "x$with_wnck" = xwnck3 -o "x$with_wnck" = xcheck],
 		[PKG_CHECK_MODULES([WNCK3], [libwnck-3.0],
 			[
 				AC_DEFINE([HAVE_WNCK3], [1], [Define if you have libwnck-3.0])
